@@ -1,25 +1,42 @@
 (ns user
-  (:require
-   [clojure.pprint :refer [pprint]]
-   [clojure.tools.namespace.repl :refer [refresh refresh-all]]
-   [com.stuartsierra.component :as component]
-   [twitter-client.app :as app]))
+  (:require [clojure.pprint :refer [pprint]]
+            [clojure.tools.namespace.repl :as tn]
+            [mount.core :as mount :refer [defstate]]
+            [http.async.client :as ac]
+            [twitter-client.config :as config]
+            [twitter-client.twitter-stream :as ts]
+            [twitter.oauth :as oauth]))
 
-(def system nil)
-
-(def system-configs
-  {:tc {:a 0 :b 1}})
-
-(defn init []
-  (alter-var-root #'system (constantly (app/make-system system-configs))))
+(defstate dev-twitter-api-conf
+  :start (config/load-config "dev-resources/my-twitter-api-conf.edn"))
 
 (defn start []
-  (alter-var-root #'system app/start-system))
+  (mount/start-with {#'twitter-client.config/twitter-api-conf #'dev-twitter-api-conf}))
 
 (defn stop []
-  (alter-var-root #'system
-                  (fn [s] (when s (app/stop-system s)))))
+  (mount/stop))
+
+(defn refresh []
+  (stop)
+  (tn/refresh))
+
+(defn refresh-all []
+  (stop)
+  (tn/refresh-all))
 
 (defn go []
-  (init)
-  (start))
+  "starts all states defined by defstate"
+  (start)
+  :ready)
+
+(defn reset []
+  "stops all states defined by defstate, reload modified source files, and restarts the states"
+  (stop)
+  (tn/refresh :after 'user/go))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(mount/in-clj-mode)
