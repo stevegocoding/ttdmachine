@@ -11,7 +11,6 @@
                  [twitter-api "0.7.8"]]
   :plugins [[cider/cider-nrepl "0.11.0-SNAPSHOT"]
             [refactor-nrepl "2.0.0-SNAPSHOT"]]
-  :main ^:skip-aot twitter-client.core
   :target-path "target/%s"
   :profiles {:uberjar {:at :all}
              :dev {:source-paths ["dev"]

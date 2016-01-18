@@ -25,7 +25,4 @@
            (finally (ts/close-stream response)))
       (catch java.util.concurrent.CancellationException e (str "Caught Exception" (.getMessage e))))))
 
-(deftest test-test
-  (is (= 0 0)))
-
-(run-tests 'twitter-client.twitter-stream-test)
+(run-tests)
